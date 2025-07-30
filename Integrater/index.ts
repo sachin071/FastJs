@@ -6,11 +6,7 @@ import cors from '@fastify/cors';
 
 export async function registerControllers(app: FastifyInstance) {
 
-
-    console.clear()
-
     const config = configurations
-    console.log(config)
     if ('cors' in config) {
         await app.register(cors, config.cors)
     }
@@ -26,7 +22,7 @@ export async function registerControllers(app: FastifyInstance) {
     for (const controller of allRoutes) {
         for (const route of controller.routes) {
             const { method, path, handlerName } = route;
-            const fullPath = `${controller.prefix}${path}`;
+            var fullPath = `${controller.prefix}${path}`;
             app.route({
                 method: method.toUpperCase() as any,
                 url: `/${fullPath}`,
@@ -40,22 +36,29 @@ export async function registerControllers(app: FastifyInstance) {
                     var args = new Array(paramCount).fill(undefined);
 
                     for (const index of bodyParamIndexes) {
-                        args[index] = await request.body;
+                        args[index] = request.body;
                     }
+                    console.log(paramCount)
 
                     //Body Keys
                     const bodyParams: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('body_object_params', prototype, handlerName) || [];
-                    const paramObjectCount = handler.length;
-                    
-                    console.log(paramObjectCount)
-
                     for (const { index, key } of bodyParams) {
-                        if(key){
+                        if(key != null){
                             args[index] = request.body?.[key]
                         }
                     }
 
-                    console.log(args)
+
+                    const RequestParam: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('RequestClosure', prototype, handlerName) || [];
+                    for (const {index} of RequestParam) {
+                            args[index] = request
+                    }
+
+
+                    const ResponseParam: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
+                    for (const {index} of ResponseParam) {
+                            args[index] = request
+                    }
 
 
                     

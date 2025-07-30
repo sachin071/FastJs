@@ -1,7 +1,7 @@
-import { UserController } from "./Modules/Usermodule/Controller.ts"
-import { TestingController } from "./Modules/TestingModule/Controller.ts"
+import { HomeModule } from "./Modules/BaseModule/Controller.ts"
 
-export const Controllers = [UserController,TestingController]
+
+export const Controllers = [HomeModule]
 export const configurations = {
     cors:{
         origin:'*',

@@ -81,7 +81,7 @@ export function Put(path: string) {
 
 
 
-export function PATCH(path: string) {
+export function Patch(path: string) {
     return (target: any, propertyKey: any) => {
         const classController = target.constructor;
         const routes = Reflect.getMetadata('routes', classController) || []
@@ -99,7 +99,7 @@ export function PATCH(path: string) {
 export function Delete(path: string) {
     return (target: any, propertyKey: any) => {
         const classController = target.constructor;
-        const routes = Reflect.getMetadata('routes', classController)
+        const routes = Reflect.getMetadata('routes', classController) || []
         routes.push({
             method: 'DELETE',
             path: path,
@@ -140,16 +140,16 @@ export function BodyObject(key: string): ParameterDecorator {
 
 export function Req():ParameterDecorator {
     return (ClassName :any , FunctionName :any , DataIndex:any) =>{
-        const existing = Reflect.getOwnMetadata('RequestClosure' , ClassName , FunctionName)
+        const existing :number[] = Reflect.getOwnMetadata('RequestClosure' , ClassName , FunctionName) || []
         existing.push(DataIndex)
-        Reflect.defineMetadata('RequestClosure' , ClassName , FunctionName)
+        Reflect.defineMetadata('RequestClosure',existing , ClassName , FunctionName)
     }
 }
 
 export function Res():ParameterDecorator {
     return (ClassName :any , FunctionName :any , DataIndex:any) =>{
-        const existing = Reflect.getOwnMetadata('ResponseClosure' , ClassName , FunctionName)
+        const existing = Reflect.getOwnMetadata('ResponseClosure' , ClassName , FunctionName) || []
         existing.push(DataIndex)
-        Reflect.defineMetadata('ResponseClosure' , ClassName , FunctionName)
+        Reflect.defineMetadata('ResponseClosure',existing , ClassName , FunctionName)
     }
 }
