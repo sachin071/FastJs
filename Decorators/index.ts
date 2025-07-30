@@ -120,10 +120,11 @@ export function Body(): ParameterDecorator {
 
 
 
-export function Param(Paramname: any): ParameterDecorator {
+export function Param(Paramname: string): ParameterDecorator {
     return (ClassName: any, FunctionName: any, Data: any) => {
-        const existing = Reflect.getOwnMetadata('Parameters', ClassName, FunctionName) || {}
-        Reflect.defineMetadata('Paramters', { ...existing, [Data]: Paramname }, ClassName, FunctionName)
+        const existing = Reflect.getOwnMetadata('routeParams', ClassName, FunctionName) || []
+        existing.push({index:Data , key:Paramname})
+        Reflect.defineMetadata('routeParams', existing, ClassName, FunctionName)
     }
 }
 

@@ -3,12 +3,17 @@ import { Inject } from '../Decorators/index.ts';
 import { Controllers } from '../configuration.ts';
 import { configurations } from '../configuration.ts';
 import cors from '@fastify/cors';
+import chalk from 'chalk';
 
 export async function registerControllers(app: FastifyInstance) {
 
+    console.clear()
+
     const config = configurations
     if ('cors' in config) {
-        await app.register(cors, config.cors)
+        if(config.cors){
+            await app.register(cors, config.cors)
+        }
     }
     const controllers = Controllers
     var allRoutes = controllers.map((controller: any): { Instance: any, prefix: any, routes: any[] } => {
@@ -38,7 +43,6 @@ export async function registerControllers(app: FastifyInstance) {
                     for (const index of bodyParamIndexes) {
                         args[index] = request.body;
                     }
-                    console.log(paramCount)
 
                     //Body Keys
                     const bodyParams: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('body_object_params', prototype, handlerName) || [];
@@ -49,15 +53,20 @@ export async function registerControllers(app: FastifyInstance) {
                     }
 
 
-                    const RequestParam: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('RequestClosure', prototype, handlerName) || [];
+                    const RequestParam = Reflect.getOwnMetadata('RequestClosure', prototype, handlerName) || [];
                     for (const {index} of RequestParam) {
                             args[index] = request
                     }
 
 
-                    const ResponseParam: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
+                    const ResponseParam = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
                     for (const {index} of ResponseParam) {
                             args[index] = request
+                    }
+
+                    const routeParams:any = Reflect.getOwnMetadata("routeParams" , prototype , handlerName) || []
+                    for(const {index , key} of routeParams){
+                        args[index] = request.params[key]
                     }
 
 
@@ -66,7 +75,7 @@ export async function registerControllers(app: FastifyInstance) {
                     return result
                 }
             });
-            console.log(`/${fullPath} is binded to ${method} Method`)
+            console.log( chalk.green(` ${method} '/${fullPath}' path is Successfully Generated `))
         }
     }
 
