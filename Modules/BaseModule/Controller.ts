@@ -1,15 +1,20 @@
-import { Controller, Get, Param , Post} from "../../Decorators/index.ts";
+import { Controller, Get, Param, Post } from "../../Decorators/index.ts";
 import { HomeService } from "./Service.ts";
 
 @Controller('')
-export class HomeModule{
+export class BaseModule {
 
-    constructor(private readonly homeservice : HomeService){
+    constructor(private readonly homeservice: HomeService) {
     }
 
     @Get("")
-    async HomeFunction(){
+    async HomeFunction() {
         return this.homeservice.HomeFunction()
+    }
+
+    @Get("Home")
+    async HomeWorkingFunction() {
+        return "Working Module"
     }
 
 

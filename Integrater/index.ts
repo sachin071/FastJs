@@ -11,7 +11,7 @@ export async function registerControllers(app: FastifyInstance) {
 
     const config = configurations
     if ('cors' in config) {
-        if(config.cors){
+        if (config.cors) {
             await app.register(cors, config.cors)
         }
     }
@@ -31,7 +31,7 @@ export async function registerControllers(app: FastifyInstance) {
             app.route({
                 method: method.toUpperCase() as any,
                 url: `/${fullPath}`,
-                handler: async (request:any, reply:any) => {
+                handler: async (request: any, reply: any) => {
 
                     // entire Body
                     const handler = controller.Instance[handlerName as keyof typeof controller.Instance] as Function;
@@ -47,35 +47,34 @@ export async function registerControllers(app: FastifyInstance) {
                     //Body Keys
                     const bodyParams: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('body_object_params', prototype, handlerName) || [];
                     for (const { index, key } of bodyParams) {
-                        if(key != null){
+                        if (key != null) {
                             args[index] = request.body?.[key]
                         }
                     }
 
 
                     const RequestParam = Reflect.getOwnMetadata('RequestClosure', prototype, handlerName) || [];
-                    for (const {index} of RequestParam) {
-                            args[index] = request
+                    for (const { index } of RequestParam) {
+                        args[index] = request
                     }
 
 
                     const ResponseParam = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
-                    for (const {index} of ResponseParam) {
-                            args[index] = request
+                    for (const { index } of ResponseParam) {
+                        args[index] = request
                     }
 
-                    const routeParams:any = Reflect.getOwnMetadata("routeParams" , prototype , handlerName) || []
-                    for(const {index , key} of routeParams){
+                    const routeParams: any = Reflect.getOwnMetadata("routeParams", prototype, handlerName) || []
+                    for (const { index, key } of routeParams) {
                         args[index] = request.params[key]
                     }
 
 
-                    
                     const result = await handler.apply(controller.Instance, args);
                     return result
                 }
             });
-            console.log( chalk.green(` ${method} '/${fullPath}' path is Successfully Generated `))
+            console.log(chalk.green(` ${method} '/${fullPath}' path is Successfully Generated `))
         }
     }
 

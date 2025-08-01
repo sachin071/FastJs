@@ -9,9 +9,8 @@ async function setupServer() {
 await setupServer();
 
 
-app.listen({ port: 3000 }, (err: any, address: any) => {
+app.listen({ port: Number(process.env.PORT) || 3000 }, (err: any, address: any) => {
     if (err) {
         app.log.error(err);
     }
-    console.log(`Server running`);
 });
