@@ -45,6 +45,7 @@ export function Get(path: string): MethodDecorator {
             method: 'GET',
             path: path,
             handlerName: propertyKey
+            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }
@@ -60,6 +61,7 @@ export function Post(path: string): MethodDecorator {
             method: 'Post',
             path: path,
             handlerName: propertyKey
+            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }
@@ -74,6 +76,7 @@ export function Put(path: string) {
             method: 'PUT',
             path: path,
             handlerName: propertyKey
+            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }
@@ -89,6 +92,7 @@ export function Patch(path: string) {
             method: 'PATCH',
             path: path,
             handlerName: propertyKey
+            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }
@@ -104,6 +108,7 @@ export function Delete(path: string) {
             method: 'DELETE',
             path: path,
             handlerName: propertyKey
+            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }

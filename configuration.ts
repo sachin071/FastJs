@@ -3,9 +3,8 @@ import { BaseModule } from "./Modules/BaseModule/Controller.ts"
 import dotenv from 'dotenv'
 dotenv.config()
 
-
-
 export const Controllers = [BaseModule]
+
 export const configurations: configuration = {
     cors: {
         origin: '*',

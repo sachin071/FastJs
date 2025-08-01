@@ -4,11 +4,11 @@ import { Controllers } from '../configuration.ts';
 import { configurations } from '../configuration.ts';
 import cors from '@fastify/cors';
 import chalk from 'chalk';
+import { checkAuthentication } from '../authentication.ts';
 
 export async function registerControllers(app: FastifyInstance) {
 
-    console.clear()
-
+    
     const config = configurations
     if ('cors' in config) {
         if (config.cors) {
@@ -26,7 +26,7 @@ export async function registerControllers(app: FastifyInstance) {
 
     for (const controller of allRoutes) {
         for (const route of controller.routes) {
-            const { method, path, handlerName } = route;
+            const { method, path, handlerName} = route;
             var fullPath = `${controller.prefix}${path}`;
             app.route({
                 method: method.toUpperCase() as any,
@@ -61,7 +61,7 @@ export async function registerControllers(app: FastifyInstance) {
 
                     const ResponseParam = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
                     for (const index of ResponseParam) {
-                        args[index] = request
+                        args[index] = reply
                     }
 
                     const routeParams: any = Reflect.getOwnMetadata("routeParams", prototype, handlerName) || []
@@ -97,9 +97,22 @@ export async function registerControllers(app: FastifyInstance) {
                         args[Index] = request?.headers[key]
                     }
 
+                    const isAuthorized = Reflect.getMetadata('isAuthorized',prototype , handlerName)
+                    console.log(request.headers)
+                    if(isAuthorized){
+                        if(checkAuthentication(request.headers.authorization).success){
+                            const result = await handler.apply(controller.Instance, args);
+                            return result
+                        }
+                        else{
+                            const result = checkAuthentication(request.headers.authorization).failureData
+                            return result
+                        }
 
+                    }
                     const result = await handler.apply(controller.Instance, args);
                     return result
+                    
                 }
             });
             console.log(chalk.green(` ${method} '/${fullPath}' path is Successfully Generated `))
