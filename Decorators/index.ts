@@ -123,7 +123,7 @@ export function Body(): ParameterDecorator {
 export function Param(Paramname: string): ParameterDecorator {
     return (ClassName: any, FunctionName: any, Data: any) => {
         const existing = Reflect.getOwnMetadata('routeParams', ClassName, FunctionName) || []
-        existing.push({index:Data , key:Paramname})
+        existing.push({ index: Data, key: Paramname })
         Reflect.defineMetadata('routeParams', existing, ClassName, FunctionName)
     }
 }
@@ -131,26 +131,65 @@ export function Param(Paramname: string): ParameterDecorator {
 
 
 export function BodyObject(key: string): ParameterDecorator {
-    return(ClassName: any, FunctionName: any, DataIndex: any) => {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
         const existing: Array<{ index: number; key: string }> = Reflect.getOwnMetadata('body_object_params', ClassName, FunctionName) || [];
-        existing.push({ index: DataIndex, key:key });
+        existing.push({ index: DataIndex, key: key });
         Reflect.defineMetadata('body_object_params', existing, ClassName, FunctionName);
     };
 }
 
 
-export function Req():ParameterDecorator {
-    return (ClassName :any , FunctionName :any , DataIndex:any) =>{
-        const existing :number[] = Reflect.getOwnMetadata('RequestClosure' , ClassName , FunctionName) || []
+export function Req(): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing: number[] = Reflect.getOwnMetadata('RequestClosure', ClassName, FunctionName) || []
         existing.push(DataIndex)
-        Reflect.defineMetadata('RequestClosure',existing , ClassName , FunctionName)
+        Reflect.defineMetadata('RequestClosure', existing, ClassName, FunctionName)
     }
 }
 
-export function Res():ParameterDecorator {
-    return (ClassName :any , FunctionName :any , DataIndex:any) =>{
-        const existing = Reflect.getOwnMetadata('ResponseClosure' , ClassName , FunctionName) || []
+export function Res(): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing = Reflect.getOwnMetadata('ResponseClosure', ClassName, FunctionName) || []
         existing.push(DataIndex)
-        Reflect.defineMetadata('ResponseClosure',existing , ClassName , FunctionName)
+        Reflect.defineMetadata('ResponseClosure', existing, ClassName, FunctionName)
+    }
+}
+
+
+
+export function Query(): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing = Reflect.getOwnMetadata('QueryData', ClassName, FunctionName) || []
+        existing.push(DataIndex)
+        Reflect.defineMetadata('QueryData', existing, ClassName, FunctionName)
+    }
+}
+
+
+export function QueryObject(key: string): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing = Reflect.getOwnMetadata('QueryObject', ClassName, FunctionName) || []
+        existing.push({ Index: DataIndex, key: key })
+        Reflect.defineMetadata('QueryObject', existing, ClassName, FunctionName)
+    }
+}
+
+
+
+export function Headers(): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing = Reflect.getOwnMetadata('HeaderData', ClassName, FunctionName) || []
+        existing.push(DataIndex)
+        Reflect.defineMetadata('HeaderData', existing, ClassName, FunctionName)
+    }
+}
+
+
+
+export function HeadersObject(key: string): ParameterDecorator {
+    return (ClassName: any, FunctionName: any, DataIndex: any) => {
+        const existing = Reflect.getOwnMetadata('HeaderObject', ClassName, FunctionName) || []
+        existing.push({ Index: DataIndex, key: key })
+        Reflect.defineMetadata('HeaderObject', existing, ClassName, FunctionName)
     }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post } from "../../Decorators/index.ts";
+import { Controller, Get } from "../../Decorators/index.ts";
 import { HomeService } from "./Service.ts";
 
 @Controller('')
@@ -10,11 +10,6 @@ export class BaseModule {
     @Get("")
     async HomeFunction() {
         return this.homeservice.HomeFunction()
-    }
-
-    @Get("Home")
-    async HomeWorkingFunction() {
-        return "Working Module"
     }
 
 

@@ -54,19 +54,47 @@ export async function registerControllers(app: FastifyInstance) {
 
 
                     const RequestParam = Reflect.getOwnMetadata('RequestClosure', prototype, handlerName) || [];
-                    for (const { index } of RequestParam) {
+                    for (const index of RequestParam) {
                         args[index] = request
                     }
 
 
                     const ResponseParam = Reflect.getOwnMetadata('ResponseClosure', prototype, handlerName) || [];
-                    for (const { index } of ResponseParam) {
+                    for (const index of ResponseParam) {
                         args[index] = request
                     }
 
                     const routeParams: any = Reflect.getOwnMetadata("routeParams", prototype, handlerName) || []
                     for (const { index, key } of routeParams) {
                         args[index] = request.params[key]
+                    }
+
+
+                    const QueryData: any = Reflect.getOwnMetadata("QueryData", prototype, handlerName) || []
+                    for (const index of QueryData) {
+                        args[index] = { ...request.query }
+                    }
+
+
+
+                    const QueryObject: any = Reflect.getOwnMetadata("QueryObject", prototype, handlerName) || []
+                    for (const { Index, key } of QueryObject) {
+                        args[Index] = request?.query[key]
+                    }
+
+
+
+
+                    const HeaderData: any = Reflect.getOwnMetadata("HeaderData", prototype, handlerName) || []
+                    for (const index of HeaderData) {
+                        args[index] = { ...request.headers }
+                    }
+
+
+
+                    const HeaderObject: any = Reflect.getOwnMetadata("HeaderObject", prototype, handlerName) || []
+                    for (const { Index, key } of HeaderObject) {
+                        args[Index] = request?.headers[key]
                     }
 
 
