@@ -92,7 +92,6 @@ export function Patch(path: string) {
             method: 'PATCH',
             path: path,
             handlerName: propertyKey
-            
         })
         Reflect.defineMetadata('routes', routes, classController)
     }

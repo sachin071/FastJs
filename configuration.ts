@@ -1,9 +1,11 @@
 import { configuration } from "./Configuration/Interface.ts"
 import { BaseModule } from "./Modules/BaseModule/Controller.ts"
+import { userController } from "./Modules/UserModule/Controller.ts"
 import dotenv from 'dotenv'
 dotenv.config()
 
-export const Controllers = [BaseModule]
+export const Controllers = [BaseModule, userController]
+export const AuthenticationController = []
 
 export const configurations: configuration = {
     cors: {
@@ -12,10 +14,9 @@ export const configurations: configuration = {
         credentials: true
     },
     JWTAuthentiaction: {
-        Custom: false,
         Secret: process.env.SECRET,
         signinOptions: {
-            expiresin: '30d'
+            expiresIn: '30d'
         }
     }
 }

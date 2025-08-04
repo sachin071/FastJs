@@ -4,16 +4,21 @@ import { Controllers } from '../configuration.ts';
 import { configurations } from '../configuration.ts';
 import cors from '@fastify/cors';
 import chalk from 'chalk';
-import { checkAuthentication } from '../authentication.ts';
+import { getAuthFunction } from '../auth/index.ts';
+import Jwt, { JwtPayload } from 'jsonwebtoken';
 
 export async function registerControllers(app: FastifyInstance) {
 
-    
+
     const config = configurations
     if ('cors' in config) {
         if (config.cors) {
             await app.register(cors, config.cors)
         }
+    }
+
+    if ('JWTAuthentiaction' in config) {
+        console.log("it exists")
     }
     const controllers = Controllers
     var allRoutes = controllers.map((controller: any): { Instance: any, prefix: any, routes: any[] } => {
@@ -26,18 +31,17 @@ export async function registerControllers(app: FastifyInstance) {
 
     for (const controller of allRoutes) {
         for (const route of controller.routes) {
-            const { method, path, handlerName} = route;
+            const { method, path, handlerName } = route;
             var fullPath = `${controller.prefix}${path}`;
             app.route({
                 method: method.toUpperCase() as any,
                 url: `/${fullPath}`,
                 handler: async (request: any, reply: any) => {
-
-                    // entire Body
                     const handler = controller.Instance[handlerName as keyof typeof controller.Instance] as Function;
                     const prototype = Object.getPrototypeOf(controller.Instance);
                     const bodyParamIndexes: number[] = Reflect.getOwnMetadata('body_params', prototype, handlerName) || [];
                     const paramCount = handler.length;
+
                     var args = new Array(paramCount).fill(undefined);
 
                     for (const index of bodyParamIndexes) {
@@ -96,23 +100,61 @@ export async function registerControllers(app: FastifyInstance) {
                     for (const { Index, key } of HeaderObject) {
                         args[Index] = request?.headers[key]
                     }
+                    if ('JWTAuthentiaction' in config) {
+                        const AuthData: any = Reflect.getOwnMetadata('AuthData', prototype, handlerName) || []
 
-                    const isAuthorized = Reflect.getMetadata('isAuthorized',prototype , handlerName)
-                    console.log(request.headers)
-                    if(isAuthorized){
-                        if(checkAuthentication(request.headers.authorization).success){
-                            const result = await handler.apply(controller.Instance, args);
-                            return result
-                        }
-                        else{
-                            const result = checkAuthentication(request.headers.authorization).failureData
-                            return result
-                        }
+                        const isAuthorized = Reflect.getMetadata('isAuthorized', prototype, handlerName)
+                        if (isAuthorized) {
 
+
+                            const authFunction = getAuthFunction() as any
+                            if (authFunction) {
+                                const injection = await Inject(authFunction.className)
+                                const getClassData = Object.getPrototypeOf(injection)
+                                const AuthenticatedUserData = Reflect.getMetadata('AuthData', getClassData, authFunction.AuthHandlerName)
+                                const authArgs = new Array(authFunction.fn.length).fill(undefined)
+                                var userData;
+                                if (config.JWTAuthentiaction?.Secret) {
+                                    try {
+                                        Jwt.verify(request.headers.authorization, config.JWTAuthentiaction?.Secret) as JwtPayload
+                                    }
+                                    catch {
+                                        throw "Invalid Token"
+                                    }
+                                    userData = Jwt.verify(request.headers.authorization, config.JWTAuthentiaction?.Secret) as JwtPayload
+                                }
+                                else if (!config.JWTAuthentiaction?.Secret) {
+                                    throw "Please Define A Secret key in the configurations.ts"
+                                }
+                                for (const index of AuthenticatedUserData) {
+                                    authArgs[index] = userData
+                                }
+                                authFunction.fn.apply(getClassData, authArgs)
+                                return {
+                                    Working: "true"
+                                }
+                            }
+
+
+                            // if ( ) {
+                            //     const result = await handler.apply(controller.Instance, args);
+                            //     return result
+                            // }
+                            // else {
+                            //     const result = checkAuthentication(request.headers.authorization).failureData
+                            //     return result
+                            // }
+
+                        }
+                        if (AuthData.length != 0) {
+                            throw "UnAuthenticated Api Endpoint Cannot Call AuthData"
+                        }
                     }
+
+                    console.log(controller.Instance)
                     const result = await handler.apply(controller.Instance, args);
                     return result
-                    
+
                 }
             });
             console.log(chalk.green(` ${method} '/${fullPath}' path is Successfully Generated `))
