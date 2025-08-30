@@ -9,11 +9,11 @@ export class BaseModule {
 
     constructor(private readonly homeservice: HomeService, private readonly loginModule: LoginModule) {
     }
-
     @Authorize()
     @Get("")
-    async HomeFunction() {
-        return this.homeservice.HomeFunction()
+    async HomeFunction(@AuthData() AuthData:any) {
+
+        return this.homeservice.HomeFunction(AuthData)
     }
 
     @Post("/New")

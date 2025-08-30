@@ -130,8 +130,11 @@ export async function registerControllers(app: FastifyInstance) {
                                     authArgs[index] = userData
                                 }
                                 authFunction.fn.apply(getClassData, authArgs)
-                                return {
-                                    Working: "true"
+
+                                const AuthData: any = Reflect.getOwnMetadata("AuthData", prototype, handlerName) || []
+                                for (const Index of AuthData) {
+                                    args[Index] = userData
+                                    console.log(userData)
                                 }
                             }
 
@@ -146,7 +149,7 @@ export async function registerControllers(app: FastifyInstance) {
                             // }
 
                         }
-                        if (AuthData.length != 0) {
+                        if (AuthData.length != 0 && !isAuthorized) {
                             throw "UnAuthenticated Api Endpoint Cannot Call AuthData"
                         }
                     }

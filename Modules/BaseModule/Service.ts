@@ -3,8 +3,8 @@ import { ServiceHandler } from "../../Decorators/index.ts";
 @ServiceHandler()
 export class HomeService{
 
-    async HomeFunction(){
-        return "hello World!"
+    async HomeFunction(AuthData:any){
+        return {msg:"hello World!" , data:AuthData}
     }
 
 }
