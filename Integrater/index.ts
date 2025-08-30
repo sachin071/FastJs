@@ -137,13 +137,12 @@ export async function registerControllers(app: FastifyInstance) {
                                     authArgs[index] = userData
                                 }
 
-                                const currentUrl = fullPath
                                 const urlParameters = Reflect.getMetadata('CurrentUrl', getClassData, authFunction.AuthHandlerName) || []
                                 for (const index of urlParameters) {
                                     authArgs[index] = fullPath
                                 }
-
-                                if(!authFunction.fn.apply(getClassData, authArgs)){
+                                const authfunctionresponse = await authFunction.fn.apply(getClassData,authArgs)
+                                if(!authfunctionresponse){
                                     throw 'Unauthorized 401'
                                 }
                                 

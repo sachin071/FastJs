@@ -1,19 +1,13 @@
+import { FastifyCorsOptions } from "@fastify/cors";
 import Jwt from "jsonwebtoken";
 
 export interface configuration {
-    cors?: cors | any;
+    cors?: FastifyCorsOptions;
     JWTAuthentiaction?: JWTAuthentication;
 }
 
 
 
-type RequestMethods = 'GET' | "POST" | "PUT" | "PATCH" | "DELETE" | any
-
-export interface cors {
-    origin: string | any;
-    methods: Array<RequestMethods>;
-    credentials: Boolean;
-}
 
 export interface JWTAuthentication {
 
@@ -22,8 +16,3 @@ export interface JWTAuthentication {
 
 }
 
-type Expiry = `${string}s` | `${string}m` | `${string}h` | `${string}d` | `${string}M` | `${string}y`;
-
-export interface JwtSigningOptions {
-    expiresin: Expiry;
-}

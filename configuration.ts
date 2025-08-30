@@ -9,13 +9,14 @@ export const AuthenticationController = []
 export const configurations: configuration = {
     cors: {
         origin: '*',
-        methods: ['GET', "POST", "PUT", "PATCH", "DELETE"],
-        credentials: true
+        methods: ['GET', "POST", "PUT", "PATCH" , "DELETE"],
+        credentials:true
+        
     },
     JWTAuthentiaction: {
         Secret: process.env.SECRET,
         signinOptions: {
-            expiresIn: '30d'
+            expiresIn: '5s'
         }
     }
 }
