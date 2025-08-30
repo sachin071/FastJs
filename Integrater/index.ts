@@ -18,7 +18,6 @@ export async function registerControllers(app: FastifyInstance) {
     }
 
     if ('JWTAuthentiaction' in config) {
-        console.log("it exists")
     }
     const controllers = Controllers
     var allRoutes = controllers.map((controller: any): { Instance: any, prefix: any, routes: any[] } => {
@@ -94,7 +93,10 @@ export async function registerControllers(app: FastifyInstance) {
                         args[index] = { ...request.headers }
                     }
 
-
+                    const urlParameters = Reflect.getMetadata('CurrentUrl', prototype, handlerName) || []
+                    for (const index of urlParameters) {
+                        args[index] = fullPath
+                    }
 
                     const HeaderObject: any = Reflect.getOwnMetadata("HeaderObject", prototype, handlerName) || []
                     for (const { Index, key } of HeaderObject) {
@@ -108,10 +110,15 @@ export async function registerControllers(app: FastifyInstance) {
 
 
                             const authFunction = getAuthFunction() as any
+                            if(!authFunction){
+                                throw "AuthFunction not created yet with the @Authenticator decorator Api will not work"
+                            }
+
+
                             if (authFunction) {
                                 const injection = await Inject(authFunction.className)
                                 const getClassData = Object.getPrototypeOf(injection)
-                                const AuthenticatedUserData = Reflect.getMetadata('AuthData', getClassData, authFunction.AuthHandlerName)
+                                const AuthenticatedUserData = Reflect.getMetadata('AuthData', getClassData, authFunction.AuthHandlerName) || []
                                 const authArgs = new Array(authFunction.fn.length).fill(undefined)
                                 var userData;
                                 if (config.JWTAuthentiaction?.Secret) {
@@ -129,14 +136,25 @@ export async function registerControllers(app: FastifyInstance) {
                                 for (const index of AuthenticatedUserData) {
                                     authArgs[index] = userData
                                 }
-                                authFunction.fn.apply(getClassData, authArgs)
+
+                                const currentUrl = fullPath
+                                const urlParameters = Reflect.getMetadata('CurrentUrl', getClassData, authFunction.AuthHandlerName) || []
+                                for (const index of urlParameters) {
+                                    authArgs[index] = fullPath
+                                }
+
+                                if(!authFunction.fn.apply(getClassData, authArgs)){
+                                    throw 'Unauthorized 401'
+                                }
+                                
 
                                 const AuthData: any = Reflect.getOwnMetadata("AuthData", prototype, handlerName) || []
                                 for (const Index of AuthData) {
                                     args[Index] = userData
-                                    console.log(userData)
                                 }
                             }
+
+                            
 
 
                             // if ( ) {
@@ -154,7 +172,6 @@ export async function registerControllers(app: FastifyInstance) {
                         }
                     }
 
-                    console.log(controller.Instance)
                     const result = await handler.apply(controller.Instance, args);
                     return result
 

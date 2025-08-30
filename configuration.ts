@@ -1,10 +1,9 @@
 import { configuration } from "./Configuration/Interface.ts"
 import { BaseModule } from "./Modules/BaseModule/Controller.ts"
-import { userController } from "./Modules/UserModule/Controller.ts"
 import dotenv from 'dotenv'
 dotenv.config()
 
-export const Controllers = [BaseModule, userController]
+export const Controllers = [BaseModule]
 export const AuthenticationController = []
 
 export const configurations: configuration = {

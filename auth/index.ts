@@ -22,7 +22,6 @@ export function Authorize(): MethodDecorator {
 export function AuthData(): ParameterDecorator {
     return (className: any, FunctionName: any, DataIndex: any) => {
         const existing = Reflect.getOwnMetadata('AuthData', className, FunctionName) || []
-        console.log(className, FunctionName)
         existing.push(DataIndex)
         Reflect.defineMetadata('AuthData', existing, className, FunctionName)
     }
@@ -45,6 +44,15 @@ export function Authenticator(): MethodDecorator & Function {
 
 export function getAuthFunction(): Function | null {
     return Reflect.getMetadata("AuthorizationFunction", globalThis) || null;
+}
+
+
+export function ExecutionUrl():ParameterDecorator {
+    return(ClassName : any , FunctionName: any , DataIndex:any) =>{
+        const existing = Reflect.getMetadata('CurrentUrl' , ClassName , FunctionName) || []
+        existing.push(DataIndex)
+        Reflect.defineMetadata('CurrentUrl' ,existing , ClassName , FunctionName)
+    }
 }
 
 
